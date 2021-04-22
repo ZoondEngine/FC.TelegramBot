@@ -70,6 +70,14 @@ namespace FC.TelegramBot.Core.Settings
                 ["key"] = "1653818201:AAF7nB72uiljkyR2Vb6xulQwYq4ggWbzlHY",
             });
 
+            data.Push( "database", new Dictionary<string, string>()
+            {
+                [ "host" ] = "127.0.0.1",
+                [ "user" ] = "root",
+                [ "password" ] = "password_here",
+                [ "db" ] = "fc-database",
+            });
+
             return JsonSerializer.Serialize( data );
         }
 
