@@ -78,7 +78,18 @@ namespace FC.TelegramBot.Core.Settings
                 [ "db" ] = "fc-database",
             });
 
-            return JsonSerializer.Serialize( data );
+            data.Push( "user", new Dictionary<string, string>()
+            {
+                ["role-id-creation"] = "1"
+            });
+
+            return JsonSerializer.Serialize( 
+                data, 
+                new JsonSerializerOptions() 
+                {
+                    WriteIndented = true
+                } 
+            );
         }
 
         public object Get( string key, string subkey = "" )

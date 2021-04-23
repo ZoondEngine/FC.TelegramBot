@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Extensions.Object;
+using Extensions.Object.Exceptions;
+using FC.TelegramBot.Core.Eventing;
 using FC.TelegramBot.Core.Terminal;
 using Telegram.Bot.Args;
 
@@ -8,26 +10,34 @@ namespace FC.TelegramBot.Core.Messaging.Behaviours
     public class MessageHandleBehaviour : ExBehaviour
     {
         private ExMessagingObject Parent;
-        private ExTerminalObject Terminal;
-        private List<IMessageHandler> Handlers = new List<IMessageHandler>();
-        private Queue<MessageEventArgs> Messages = new Queue<MessageEventArgs>();
+        private ExEventObject EventSystem;
+
+        private readonly List<IMessageHandler> Handlers 
+            = new List<IMessageHandler>();
+        private readonly Queue<MessageEventArgs> Messages 
+            = new Queue<MessageEventArgs>();
 
         public override void Awake()
         {
             Parent = ParentObject.Unbox<ExMessagingObject>();
-            Terminal = FindObjectOfType<ExTerminalObject>();
+            EventSystem = FindObjectOfType<ExEventObject>();
 
             ThrowIf( 
-                Parent == null || Terminal == null, 
-                new Extensions.Object.Exceptions.ExException( "Parent object can't be a null!" ) 
+                Parent == null || EventSystem == null, 
+                new ExException( "Parent object can't be a null!" ) 
             );
+
+            EventSystem.Register( "OnMessageHandled" );
+            EventSystem.Register( "OnStartMessageReceived" );
+            EventSystem.Register( "OnSpamDetected" );
+            EventSystem.Register( "OnMessageHandleError" );
+            EventSystem.Register( "OnUnrecognizableMessage" );
         }
 
         public override void Update()
         {
             if(Messages.Count > 0)
             {
-                Terminal.Write().Success( $"Objects in queue: {Messages.Count}" );
                 var message = Messages.Dequeue();
 
                 foreach(var handler in Handlers)
@@ -36,16 +46,25 @@ namespace FC.TelegramBot.Core.Messaging.Behaviours
                     {
                         if (handler.Execute(Parent.GetClient(), message))
                         {
-                            Terminal.Write().Debug( $"Message '{message.Message.Text}'(@{message.Message.From.Username}) proceed: true" );
+                            EventSystem.Call(
+                                "OnMessageHandled",
+                                new CoreEvent( this, new List<object>() { message.Message, handler } )
+                            );
                         }
                         else
                         {
-                            Terminal.Write().Error( $"Can't execute message '{message.Message.Text}'(@{message.Message.From.Username}) proceed: false" );
+                            EventSystem.Call( 
+                                "OnMessageHandleError", 
+                                new CoreEvent( this, new List<object>() { message.Message, handler } ) 
+                            );
                         }
                     }
                     else
                     {
-                        Terminal.Write().Warning( $"Not found handler for message: '{message.Message.Text}'(@{message.Message.From.Username})" );
+                        EventSystem.Call( 
+                            "OnUnrecognizableMessage", 
+                            new CoreEvent( this, new List<object>() { message.Message } ) 
+                        );
                     }
                 }
             }

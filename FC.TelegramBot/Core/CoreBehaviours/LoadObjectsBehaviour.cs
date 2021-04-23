@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Extensions.Object;
+using FC.TelegramBot.Core.Database;
+using FC.TelegramBot.Core.Eventing;
 using FC.TelegramBot.Core.Messaging;
 using FC.TelegramBot.Core.Settings;
 using FC.TelegramBot.Core.Terminal;
@@ -14,9 +16,11 @@ namespace FC.TelegramBot.Core.CoreBehaviours
 
         public void Load()
         {
+            LoadedObjects.Add( Instantiate<ExEventObject>() );
             LoadedObjects.Add( Instantiate<ExTerminalObject>() );
             LoadedObjects.Add( Instantiate<ExSettingsObject>() );
             LoadedObjects.Add( Instantiate<ExWordsObject>() );
+            LoadedObjects.Add( Instantiate<ExDatabaseObject>() );
             LoadedObjects.Add( Instantiate<ExMessagingObject>() );
         }
 

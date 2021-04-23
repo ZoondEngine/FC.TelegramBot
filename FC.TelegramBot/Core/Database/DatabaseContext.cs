@@ -1,4 +1,5 @@
-﻿using FC.TelegramBot.Core.Database.Models;
+﻿using System;
+using FC.TelegramBot.Core.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FC.TelegramBot.Core.Database

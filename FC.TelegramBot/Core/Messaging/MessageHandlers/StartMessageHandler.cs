@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Extensions.Object;
-using FC.TelegramBot.Core.Database;
+using FC.TelegramBot.Core.Eventing;
 using FC.TelegramBot.Core.Words;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -20,13 +19,16 @@ namespace FC.TelegramBot.Core.Messaging.MessageHandlers
             client.SendChatActionAsync( message.Message.Chat.Id, ChatAction.Typing );
 
             var words = ExObject.FindObjectOfType<ExWordsObject>();
-            //using var db = ExObject.FindObjectOfType<ExDatabaseObject>().Db();
-            //
             var data = message.Message;
-            //if ( db.Users.FirstOrDefault( ( x ) => x.UserName == data.From.Username ) == default )
-            //{
-            //
-            //}
+
+            ExObject.FindObjectOfType<ExEventObject>().Call( "OnStartMessageReceived", new CoreEvent
+            (
+                this,
+                new List<object>()
+                {
+                    data
+                }
+            ));
 
             var replyKeyboardMarkup = new ReplyKeyboardMarkup(
                 new KeyboardButton[][]

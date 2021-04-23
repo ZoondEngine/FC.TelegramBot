@@ -35,8 +35,10 @@ namespace FC.TelegramBot.Core.Terminal.Behaviours
         private void Write( WriteBehaviourType type, string what )
         {
             Console.ForegroundColor = ( ConsoleColor ) type;
-            Console.Write( what );
+            Console.Write( $"[{GetDate()}]: {what}" );
             Console.ResetColor();
         }
+        private string GetDate()
+            => DateTime.Now.ToString( "dd/MM/yyyy HH:mm:ss" );
     }
 }

@@ -4,24 +4,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FC.TelegramBot.Core.Database.Models
 {
-    [Table("bot_order_item_modifiers")]
-    public class OrderItemModifier
+    [Table("bot_order_statuses")]
+    public class OrderStatus
     {
         [Key]
-        [Column( "bot_id" )]
+        [Column("id")]
         public long Id { get; set; }
 
-        [Column( "item_id" )]
-        public long ItemId { get; set; }
-
-        [Column( "title" )]
+        [Column("title")]
         public string Title { get; set; }
 
-        [Column( "description" )]
+        [Column("description")]
         public string Description { get; set; }
-
-        [Column( "price_modifier" )]
-        public float PriceModifier { get; set; }
 
         [Column( "created_at" )]
         public DateTime? CreatedAt { get; set; }

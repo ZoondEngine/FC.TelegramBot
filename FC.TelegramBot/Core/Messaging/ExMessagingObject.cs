@@ -11,6 +11,7 @@ namespace FC.TelegramBot.Core.Messaging
     [RequiredBehaviour(typeof(MessageHandleBehaviour))]
     [RequiredBehaviour(typeof(LoadFromSelfBehaviour))]
     [RequiredBehaviour(typeof(LoadFromAssembliesBehaviour))]
+    [RequiredBehaviour(typeof(InformatorBehaviour))]
     public class ExMessagingObject : ExObject
     {
         private ITelegramBotClient BotClient;
@@ -42,11 +43,15 @@ namespace FC.TelegramBot.Core.Messaging
 
             BotClient.StartReceiving();
             BotClient.OnMessage += OnMessageHandler;
+            BotClient.OnReceiveError += OnErrorHandler;
+            BotClient.OnReceiveGeneralError += OnGeneralErrorHandler;
         }
 
         public void Stop()
         {
             BotClient.OnMessage -= OnMessageHandler;
+            BotClient.OnReceiveError -= OnErrorHandler;
+            BotClient.OnReceiveGeneralError -= OnGeneralErrorHandler;
             BotClient.StopReceiving();
         }
 
@@ -58,6 +63,18 @@ namespace FC.TelegramBot.Core.Messaging
 
         private void OnMessageHandler( object sender, MessageEventArgs e )
             => GetComponent<MessageHandleBehaviour>().ApproveMessage( e );
+
+        private void OnErrorHandler( object sender, ReceiveErrorEventArgs e )
+        {
+            Terminal.Write().Error( $"Error recevied: {e.ApiRequestException}" );
+            Log.Error(e.ApiRequestException.ToString());
+        }
+
+        private void OnGeneralErrorHandler( object sender, ReceiveGeneralErrorEventArgs e )
+        {
+            Terminal.Write().Error( $"!! Fatal error occured: {e.Exception}" );
+            Log.Error( "FATAL -- " + e.Exception.ToString() );
+        }
 
         public ITelegramBotClient GetClient()
             => BotClient;
