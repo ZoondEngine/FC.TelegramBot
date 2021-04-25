@@ -15,6 +15,9 @@ namespace FC.TelegramBot.Core.Words
             [ "menu__report" ] = "Отправить жалобу",
 
             ["text__welcomeMessage"] = "Добро пожаловать :username! Вы можете заказать кофе из контекстного меню!",
+
+            ["order__orderAlreadyExists"] = "В данный момент заказ :order уже в обработке. Ожидайте, пожалуйста",
+            ["order__orderStart"] = "Я готов принять ваш заказ. <b>Идентификатор заказа :orderId</b>. Выберите меню из списка ниже, чтобы приступить к оформлению заказа",
         };
 
         public string Word( string key )

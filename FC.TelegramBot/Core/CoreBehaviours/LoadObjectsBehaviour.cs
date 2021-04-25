@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Extensions.Object;
+using FC.TelegramBot.Core.Commerce;
 using FC.TelegramBot.Core.Database;
 using FC.TelegramBot.Core.Eventing;
 using FC.TelegramBot.Core.Messaging;
@@ -22,6 +23,7 @@ namespace FC.TelegramBot.Core.CoreBehaviours
             LoadedObjects.Add( Instantiate<ExWordsObject>() );
             LoadedObjects.Add( Instantiate<ExDatabaseObject>() );
             LoadedObjects.Add( Instantiate<ExMessagingObject>() );
+            LoadedObjects.Add( Instantiate<ExCommerceObject>() );
         }
 
         public T Find<T>() where T : ExObject

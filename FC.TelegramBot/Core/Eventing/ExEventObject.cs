@@ -6,7 +6,7 @@ namespace FC.TelegramBot.Core.Eventing
 {
     public class ExEventObject : ExObject
     {
-        public Dictionary<string, List<Action<CoreEvent>>> Events 
+        private Dictionary<string, List<Action<CoreEvent>>> Events 
             = new Dictionary<string, List<Action<CoreEvent>>>();
 
         public ExEventObject()
@@ -30,7 +30,7 @@ namespace FC.TelegramBot.Core.Eventing
 
                 for ( var i = 0; i < @event.Count; i++ )
                 {
-                    @event[ i ].Invoke( args );
+                    @event[ i ]?.Invoke( args );
                 }
             }
         }

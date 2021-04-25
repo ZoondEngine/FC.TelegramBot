@@ -34,6 +34,11 @@ namespace FC.TelegramBot.Core.Settings
         {
             var path = Path.Combine( "settings", "bot_config.json" );
 
+            if ( !Directory.Exists( "settings" ) )
+            {
+                Directory.CreateDirectory( "settings" );
+            }
+
             if ( !File.Exists( path ) ) 
             {
                 File.WriteAllText( path, SerializeDefault() );

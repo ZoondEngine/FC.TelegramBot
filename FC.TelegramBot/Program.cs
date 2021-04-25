@@ -1,4 +1,5 @@
 ﻿using System;
+using Extensions.Object;
 
 namespace FC.TelegramBot
 {
@@ -6,7 +7,7 @@ namespace FC.TelegramBot
     {
         static void Main( string[] args )
         {
-            var context = Extensions.Object.ExObject.Instantiate<BotContext>();
+            var context = ExObject.Instantiate<BotContext>();
             context.Load();
 
             Lock();
@@ -23,6 +24,7 @@ namespace FC.TelegramBot
                     || line.Contains("exit"))
                 {
                     break;
+
                 }
             }
         }

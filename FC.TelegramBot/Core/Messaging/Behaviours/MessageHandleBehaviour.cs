@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Extensions.Object;
 using Extensions.Object.Exceptions;
+using FC.TelegramBot.Core.Commerce;
 using FC.TelegramBot.Core.Eventing;
-using FC.TelegramBot.Core.Terminal;
 using Telegram.Bot.Args;
 
 namespace FC.TelegramBot.Core.Messaging.Behaviours
@@ -32,40 +32,55 @@ namespace FC.TelegramBot.Core.Messaging.Behaviours
             EventSystem.Register( "OnSpamDetected" );
             EventSystem.Register( "OnMessageHandleError" );
             EventSystem.Register( "OnUnrecognizableMessage" );
+            EventSystem.Register( "OnReceiveCommerceMessage" );
         }
 
         public override void Update()
         {
             if(Messages.Count > 0)
             {
+                var cart = FindObjectOfType<ExCommerceObject>().Cart();
                 var message = Messages.Dequeue();
 
-                foreach(var handler in Handlers)
+                if ( !cart.UserOrderingNow( message.Message.From.Id ) )
                 {
-                    if(handler.Executable(message))
+                    foreach ( var handler in Handlers )
                     {
-                        if (handler.Execute(Parent.GetClient(), message))
+                        if ( handler.Executable( message ) )
                         {
-                            EventSystem.Call(
-                                "OnMessageHandled",
-                                new CoreEvent( this, new List<object>() { message.Message, handler } )
-                            );
+                            if ( handler.Execute( Parent.GetClient(), message ) )
+                            {
+                                EventSystem.Call(
+                                    "OnMessageHandled",
+                                    new CoreEvent( this, new List<object>() { message.Message, handler } )
+                                );
+                            }
+                            else
+                            {
+                                EventSystem.Call(
+                                    "OnMessageHandleError",
+                                    new CoreEvent( this, new List<object>() { message.Message, handler } )
+                                );
+                            }
                         }
                         else
                         {
-                            EventSystem.Call( 
-                                "OnMessageHandleError", 
-                                new CoreEvent( this, new List<object>() { message.Message, handler } ) 
+                            EventSystem.Call(
+                                "OnUnrecognizableMessage",
+                                new CoreEvent( this, new List<object>() { message.Message } )
                             );
                         }
                     }
-                    else
-                    {
-                        EventSystem.Call( 
-                            "OnUnrecognizableMessage", 
-                            new CoreEvent( this, new List<object>() { message.Message } ) 
-                        );
-                    }
+                }
+                else
+                {
+                    // Skip default message handler and provide message to cart handlers
+                    Log.Trace( $"Commerce message triggered, calling event" );
+
+                    EventSystem.Call(
+                        "OnReceiveCommerceMessage",
+                        new CoreEvent( this, new List<object>() { message.Message } )
+                    );
                 }
             }
         }
