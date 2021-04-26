@@ -4,26 +4,21 @@ using System.Linq;
 using System.Reflection;
 using Extensions.Object;
 using FC.TelegramBot.Core.Eventing;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace FC.TelegramBot.Core.Commerce.Behaviours
 {
     public class CommerceReceivingBehaviour : ExBehaviour
     {
-        private Dictionary<string, Action<Message>> CommerceHandlers;
+        private List<ICommerceHandler> CommerceHandlers;
 
         public override void Awake()
         {
-            CommerceHandlers = new Dictionary<string, Action<Message>>();
-
-            var handlers = Assembly.GetExecutingAssembly().GetTypes().Where( ( x ) => x.GetInterfaces().Contains( typeof( ICommerceHandler ) ) )
+            CommerceHandlers = Assembly.GetExecutingAssembly().GetTypes().Where( ( x ) => x.GetInterfaces().Contains( typeof( ICommerceHandler ) ) )
                                 .Select( ( x ) => x.GetConstructor( Type.EmptyTypes )?.Invoke( null ) as ICommerceHandler )
                                 .ToList();
 
-            for ( var i = 0; i < handlers.Count; i++ )
-            {
-                CommerceHandlers.Add( handlers[ i ].Trigger(), handlers[ i ].Execute );
-            }
 
             FindObjectOfType<ExEventObject>().Subscribe( nameof( OnReceiveCommerceMessage ), OnReceiveCommerceMessage );
         }
@@ -31,15 +26,19 @@ namespace FC.TelegramBot.Core.Commerce.Behaviours
         public void OnReceiveCommerceMessage( CoreEvent args )
         {
             var msg = args.Args[ 1 ].Convert<Message>();
+            var client = args.Args[ 0 ].Convert<ITelegramBotClient>();
 
             ThrowIf( 
-                msg == null, 
+                msg == null || client == null, 
                 new Extensions.Object.Exceptions.ExException( "Commerce message can't be a null!" ) 
             );
 
-            if ( CommerceHandlers.ContainsKey( msg.Text.ToLower() ) )
+            foreach(var handler in CommerceHandlers)
             {
-                CommerceHandlers[ msg.Text.ToLower() ]?.Invoke( msg );
+                if ( handler.Triggered( msg.Text ) )
+                {
+                    handler.Execute( client, msg );
+                }
             }
         }
     }

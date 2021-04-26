@@ -23,7 +23,7 @@ namespace FC.TelegramBot.Core.Messaging.MessageHandlers
                 Words = ExObject.FindObjectOfType<ExWordsObject>();
             }
 
-            return message.Message.Text.ToLower() == Words.Word( "menu__coffeeOrder" );
+            return message.Message.Text.ToLower() == Words.Word( "menu__coffeeOrder" ).ToLower();
         }
 
         public bool Execute( ITelegramBotClient client, MessageEventArgs message )
@@ -53,6 +53,7 @@ namespace FC.TelegramBot.Core.Messaging.MessageHandlers
                     client.SendTextMessageAsync(
                         chatId: message.Message.Chat.Id,
                         text: Words.Word( "order__orderStart", new WordPair( "orderId", orderId.ToString() ) ),
+                        parseMode: Telegram.Bot.Types.Enums.ParseMode.Html,
                         replyMarkup: BuildOrderMenu()
                     );
 
@@ -83,17 +84,9 @@ namespace FC.TelegramBot.Core.Messaging.MessageHandlers
             using var context = Database.Db();
             var menus = context.OrderMenus;
 
-            foreach(var menu in menus)
+            foreach ( var menu in menus )
             {
-                keyboardItems.Add( new KeyboardButton[]
-                {
-                    menu.Title
-                });
-            }
-
-            if(keyboardItems.Count <= 0)
-            {
-                keyboardItems.Add( new KeyboardButton[] { "Раф", "Капучино", "Еще какаято фигня" } );
+                keyboardItems.Add( new KeyboardButton[] { menu.Title } );
             }
 
             return new ReplyKeyboardMarkup(

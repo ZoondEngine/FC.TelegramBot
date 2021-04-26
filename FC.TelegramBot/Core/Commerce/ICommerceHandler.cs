@@ -4,7 +4,7 @@ namespace FC.TelegramBot.Core.Commerce
 {
     interface ICommerceHandler
     {
-        public string Trigger();
-        public void Execute( Message message );
+        public bool Triggered( string text );
+        public void Execute( Telegram.Bot.ITelegramBotClient client, Message message );
     }
 }

@@ -67,7 +67,7 @@ namespace FC.TelegramBot.Core.Commerce.Behaviours
                 new Extensions.Object.Exceptions.ExException( "Order can't be a null!" )
             );
 
-            if(Cart.ContainsKey(userId))
+            if ( Cart.ContainsKey( userId ) )
             {
                 Cart[ userId ].AddItem( item );
             }
@@ -80,5 +80,8 @@ namespace FC.TelegramBot.Core.Commerce.Behaviours
                 Cart.Remove( userId );
             }
         }
+
+        public Dictionary<long, CartItem> GetCart()
+            => Cart;
     }
 }

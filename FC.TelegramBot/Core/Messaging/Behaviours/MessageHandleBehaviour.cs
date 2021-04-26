@@ -58,17 +58,10 @@ namespace FC.TelegramBot.Core.Messaging.Behaviours
                             else
                             {
                                 EventSystem.Call(
-                                    "OnMessageHandleError",
+                                    "OnUnrecognizableMessage",
                                     new CoreEvent( this, new List<object>() { message.Message, handler } )
                                 );
                             }
-                        }
-                        else
-                        {
-                            EventSystem.Call(
-                                "OnUnrecognizableMessage",
-                                new CoreEvent( this, new List<object>() { message.Message } )
-                            );
                         }
                     }
                 }
@@ -79,7 +72,7 @@ namespace FC.TelegramBot.Core.Messaging.Behaviours
 
                     EventSystem.Call(
                         "OnReceiveCommerceMessage",
-                        new CoreEvent( this, new List<object>() { message.Message } )
+                        new CoreEvent( this, new List<object>() { Parent.GetClient(), message.Message } )
                     );
                 }
             }
