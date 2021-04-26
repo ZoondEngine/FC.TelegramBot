@@ -24,11 +24,31 @@ namespace FC.TelegramBot.Core.Commerce.CommerceHandlers
 
         public void Execute( Telegram.Bot.ITelegramBotClient client, Message message )
         {
-            var item = GetRelationVolume( message.Text );
+            var item = GetRelationItem( message.Text );
 
             if ( item != null ) 
             {
+                using var db = Database.Db();
+                var volumes = db.OrderItemVolumes.Where( ( x ) => x.ItemId == item.Id );
+                
+                if ( volumes.Count() > 0 )
+                {
+                    var user = db.Users.FirstOrDefault( ( x ) => x.ExternalId == message.From.Id );
+                    var cart = ExObject.FindObjectOfType<ExCommerceObject>().Cart();
 
+                    if ( cart.UserOrderingNow( message.From.Id ) )
+                    {
+                        var order = cart.GetOrder( message.From.Id );
+                        order.AddItem( new Models.OrderedItem( item.Title, 1, item.Price ) );
+
+                        client.SendTextMessageAsync(
+                            chatId: message.Chat.Id,
+                            text: item.Description,
+                            parseMode: Telegram.Bot.Types.Enums.ParseMode.Html,
+                            replyMarkup: BuildVolumesMenu( volumes.ToList() )
+                        );
+                    }
+                }
             }
         }
 
@@ -41,8 +61,8 @@ namespace FC.TelegramBot.Core.Commerce.CommerceHandlers
                 .Count() > 0;
         }
 
-        private OrderItemVolume GetRelationVolume( string title )
-            => Database.Db().OrderItemVolumes.FirstOrDefault( ( x ) => x.Title.ToLower() == title.ToLower() );
+        private OrderItem GetRelationItem( string title )
+            => Database.Db().OrderItems.FirstOrDefault( ( x ) => x.Title.ToLower() == title.ToLower() );
 
         private ReplyKeyboardMarkup BuildOrderMenu()
         {
@@ -61,7 +81,7 @@ namespace FC.TelegramBot.Core.Commerce.CommerceHandlers
             );
         }
 
-        private ReplyKeyboardMarkup BuildItemsMenu( List<OrderItemVolume> items )
+        private ReplyKeyboardMarkup BuildVolumesMenu( List<OrderItemVolume> items )
         {
             var keyboardItems = new List<KeyboardButton[]>();
 

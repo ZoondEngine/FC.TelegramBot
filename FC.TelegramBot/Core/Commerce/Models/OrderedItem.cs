@@ -2,19 +2,26 @@
 {
     public class OrderedItem
     {
-        public long Id;
-        public long ModifierId;
-        public long VolumeId;
+        public string Item;
+        public string Modifier;
+        public string Volume;
         public int Count;
         public float Price;
 
-        public OrderedItem(long id, long modId, long volumeId, int count, float price)
+        public OrderedItem(string item, int count, float price)
         {
-            Id = id;
-            ModifierId = modId;
-            VolumeId = volumeId;
+            Item = item;
             Count = count;
             Price = price;
+        }
+
+        public void SetVolume(string volume)
+        {
+            Volume = volume;
+        }
+        public void SetModifier(string mod)
+        {
+            Modifier = mod;
         }
     }
 }

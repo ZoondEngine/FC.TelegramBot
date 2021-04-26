@@ -78,7 +78,7 @@ namespace FC.TelegramBot.Core.Commerce.CommerceHandlers
         {
             using var db = Database.Db();
 
-            return db.OrderMenus
+            return db.OrderItems
                 .Where( ( x ) => x.Title.ToLower() == text.ToLower() )
                 .Count() > 0;
         }
