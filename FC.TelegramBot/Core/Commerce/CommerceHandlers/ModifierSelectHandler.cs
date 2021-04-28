@@ -37,6 +37,8 @@ namespace FC.TelegramBot.Core.Commerce.CommerceHandlers
                 {
                     if ( cart.UserOrderingNow( message.From.Id ) )
                     {
+                        order.Order.First().Volume = volume.Title;
+
                         client.SendTextMessageAsync(
                             chatId: message.Chat.Id,
                             text: volume.Description,
@@ -59,23 +61,6 @@ namespace FC.TelegramBot.Core.Commerce.CommerceHandlers
             return db.OrderItemVolumes
                 .Where( ( x ) => x.Title.ToLower() == text.ToLower() )
                 .Count() > 0;
-        }
-
-        private ReplyKeyboardMarkup BuildOrderMenu()
-        {
-            var keyboardItems = new List<KeyboardButton[]>();
-            using var context = Database.Db();
-            var menus = context.OrderMenus;
-
-            foreach ( var menu in menus )
-            {
-                keyboardItems.Add( new KeyboardButton[] { menu.Title } );
-            }
-
-            return new ReplyKeyboardMarkup(
-                keyboard: keyboardItems.ToArray(),
-                resizeKeyboard: true
-            );
         }
 
         private ReplyKeyboardMarkup BuildModifiersMenu( List<OrderItemModifier> items )
