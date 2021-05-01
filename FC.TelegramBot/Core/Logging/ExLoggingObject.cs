@@ -29,7 +29,7 @@ namespace FC.TelegramBot.Core.Logging
             }
 
             File.AppendAllText(
-                "logs/" + DateTime.Now.ToString( "dd/MM/yyyy__HH_mm" ) + ".txt",
+                "logs/" + DateTime.Now.ToString( "dd__MM__yyyy__HH_mm" ) + ".txt",
                 FormatPrefix( prefix ) + message + Environment.NewLine
             );
         }

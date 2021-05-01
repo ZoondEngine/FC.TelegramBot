@@ -80,7 +80,7 @@ namespace FC.TelegramBot.Core.Settings
                 [ "host" ] = "127.0.0.1",
                 [ "user" ] = "root",
                 [ "password" ] = "password_here",
-                [ "db" ] = "fc-database",
+                [ "db" ] = "fc-backend-store",
             });
 
             data.Push( "user", new Dictionary<string, string>()
